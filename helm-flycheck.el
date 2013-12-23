@@ -1,0 +1,105 @@
+;;; helm-flycheck.el --- helm interface for flycheck
+
+;; Copyright (C) 2013 Yasuyuki Oka <yasuyk@gmail.com>
+
+;; Author: Yasuyuki Oka <yasuyk@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/yasuyk/helm-flycheck
+;; Package-Requires: ((dash "2.4.0") (flycheck "0.15") (helm "1.5.7"))
+;; Keywords: helm, flycheck
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Installation:
+
+;; Add the following to your Emacs init file:
+;;
+;;  (require 'helm-flycheck) ;; Not necessary if using ELPA package
+;;  (eval-after-load 'flycheck
+;;    '(define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck))
+
+;; That's all.
+
+;;; Code:
+
+(require 'dash)
+(require 'flycheck)
+(require 'helm)
+
+(defvar helm-source-flycheck
+  '((name . "Flycheck")
+    (init . helm-flycheck-init)
+    (multiline)
+    (candidates . helm-flycheck-candidates)
+    (action . (("Go to" . helm-flycheck-action-goto-error)))))
+
+(defvar helm-flycheck-candidates nil)
+
+(defun helm-flycheck-init ()
+  "Initialize `helm-source-flycheck'."
+  (setq helm-flycheck-candidates
+        (mapcar 'helm-flycheck-make-candidate
+                (flycheck-sort-errors flycheck-current-errors))))
+
+(defun helm-flycheck-make-candidate (error)
+  "Make a string of candidate for the given ERROR.
+
+Return a list with the contents of the string."
+  (let ((face (-> error
+                flycheck-error-level
+                flycheck-error-level-error-list-face)))
+    (format "%4s %3s%8s %20s  %s"
+            (flycheck-error-list-make-number-cell
+             (flycheck-error-line error) 'flycheck-error-list-line-number)
+            (flycheck-error-list-make-number-cell
+             (flycheck-error-column error)
+             'flycheck-error-list-column-number)
+            (propertize (symbol-name (flycheck-error-level error))
+                        'font-lock-face face)
+            (symbol-name (flycheck-error-checker error))
+            (or (flycheck-error-message error) ""))))
+
+(defun helm-flycheck-action-goto-error (candidate)
+  "Visit error of CANDIDATE."
+  (let* ((strings (split-string candidate))
+         (lineno (string-to-number (car strings)))
+         error-pos)
+    (goto-char (point-min))
+    (forward-line (1- lineno))
+    (setq error-pos
+          (car
+           (->> (flycheck-overlays-in
+                 (point)
+                 (save-excursion (forward-line 1) (point)))
+             (-map #'overlay-start)
+             -uniq
+             (-sort #'<=))))
+    (goto-char error-pos)))
+
+;;;###autoload
+(defun helm-flycheck ()
+  "Show flycheck errors with `helm'."
+  (interactive)
+  (helm :sources 'helm-source-flycheck
+        :buffer "*helm flycheck*"))
+
+(provide 'helm-flycheck)
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
+
+;;; helm-flycheck.el ends here
