@@ -1,6 +1,6 @@
 # helm-flycheck.el
 
-[helm] interface for [flycheck][flycheck].
+Show [flycheck] errors with [helm].
 
 ## Requirements
 

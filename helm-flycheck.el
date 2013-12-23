@@ -1,4 +1,4 @@
-;;; helm-flycheck.el --- helm interface for flycheck
+;;; helm-flycheck.el --- Show flycheck errors with helm
 
 ;; Copyright (C) 2013 Yasuyuki Oka <yasuyk@gmail.com>
 
