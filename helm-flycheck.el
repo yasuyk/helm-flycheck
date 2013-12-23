@@ -42,7 +42,6 @@
 (defvar helm-source-flycheck
   '((name . "Flycheck")
     (init . helm-flycheck-init)
-    (multiline)
     (candidates . helm-flycheck-candidates)
     (action . (("Go to" . helm-flycheck-action-goto-error)))))
 
@@ -80,7 +79,11 @@
 Return a list with the contents of the string."
   (let ((face (-> error
                 flycheck-error-level
-                flycheck-error-level-error-list-face)))
+                flycheck-error-level-error-list-face))
+        (replace-nl-to-sp (lambda (m)
+                            (ignore-errors
+                              (replace-regexp-in-string
+                               "\n *" " " m)))))
     (format "%4s %3s%8s %20s  %s"
             (flycheck-error-list-make-number-cell
              (flycheck-error-line error) 'flycheck-error-list-line-number)
@@ -90,7 +93,8 @@ Return a list with the contents of the string."
             (propertize (symbol-name (flycheck-error-level error))
                         'font-lock-face face)
             (symbol-name (flycheck-error-checker error))
-            (or (flycheck-error-message error) ""))))
+            (or (funcall replace-nl-to-sp
+                         (flycheck-error-message error)) ""))))
 
 (defun helm-flycheck-action-goto-error (candidate)
   "Visit error of CANDIDATE."
