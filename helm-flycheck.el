@@ -50,9 +50,29 @@
 
 (defun helm-flycheck-init ()
   "Initialize `helm-source-flycheck'."
-  (setq helm-flycheck-candidates
-        (mapcar 'helm-flycheck-make-candidate
-                (flycheck-sort-errors flycheck-current-errors))))
+  (let ((status (cadr (split-string
+                       flycheck-mode-line
+                       flycheck-mode-line-lighter))))
+    (if (equal ":" (ignore-errors (substring status 0 1)))
+        (setq helm-flycheck-candidates
+              (mapcar 'helm-flycheck-make-candidate
+                      (flycheck-sort-errors flycheck-current-errors)))
+      (helm-flycheck-show-status-message status)
+      (helm-exit-minibuffer))))
+
+(defun helm-flycheck-show-status-message (status)
+  "Show message about `flycheck' STATUS."
+  (message
+   (cond ((equal status "")
+          "There are no errors in the current buffer.")
+         ((equal status "*")
+          "A syntax check is being performed currently.")
+         ((equal status "-")
+          "Automatic syntax checker selection did not find a suitable syntax checker.")
+         ((equal status "!")
+          "The syntax check failed. Inspect the *Messages* buffer for details.")
+         ((equal status "?")
+          "The syntax check had a dubious result."))))
 
 (defun helm-flycheck-make-candidate (error)
   "Make a string of candidate for the given ERROR.
