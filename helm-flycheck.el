@@ -74,9 +74,7 @@
           "The syntax check had a dubious result."))))
 
 (defun helm-flycheck-make-candidate (error)
-  "Make a string of candidate for the given ERROR.
-
-Return a list with the contents of the string."
+  "Return a string of candidate for the given ERROR."
   (let ((face (-> error
                 flycheck-error-level
                 flycheck-error-level-error-list-face))
