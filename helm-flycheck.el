@@ -82,7 +82,7 @@
                             (ignore-errors
                               (replace-regexp-in-string
                                "\n *" " " m)))))
-    (format "%4s %3s%8s %20s  %s"
+    (format "%5s %3s%8s %20s  %s"
             (flycheck-error-list-make-number-cell
              (flycheck-error-line error) 'flycheck-error-list-line-number)
             (flycheck-error-list-make-number-cell
