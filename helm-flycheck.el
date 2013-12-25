@@ -82,7 +82,7 @@
                             (ignore-errors
                               (replace-regexp-in-string
                                "\n *" " " m)))))
-    (format "%5s %3s%8s %20s  %s"
+    (format "%5s %3s%8s  %s"
             (flycheck-error-list-make-number-cell
              (flycheck-error-line error) 'flycheck-error-list-line-number)
             (flycheck-error-list-make-number-cell
@@ -90,7 +90,6 @@
              'flycheck-error-list-column-number)
             (propertize (symbol-name (flycheck-error-level error))
                         'font-lock-face face)
-            (symbol-name (flycheck-error-checker error))
             (or (funcall replace-nl-to-sp
                          (flycheck-error-message error)) ""))))
 
