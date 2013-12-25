@@ -114,6 +114,8 @@
 (defun helm-flycheck ()
   "Show flycheck errors with `helm'."
   (interactive)
+  (unless flycheck-mode
+    (user-error "Flycheck mode not enabled"))
   (helm :sources 'helm-source-flycheck
         :buffer "*helm flycheck*"))
 
