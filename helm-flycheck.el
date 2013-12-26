@@ -43,19 +43,36 @@
   '((name . "Flycheck")
     (init . helm-flycheck-init)
     (candidates . helm-flycheck-candidates)
+    (action-transformer helm-flycheck-action-transformer)
     (action . (("Go to" . helm-flycheck-action-goto-error)))))
 
 (defvar helm-flycheck-candidates nil)
 
+(defconst helm-flycheck-status-message-no-errors
+  "There are no errors in the current buffer.")
+
+(defconst helm-flycheck-status-message-syntax-checking
+  "A syntax check is being performed currently.")
+
+(defconst helm-flycheck-status-message-checker-not-found
+  "A suitable syntax checker is not found. \
+See Selection in flycheck manual, for more information.")
+
+(defconst helm-flycheck-status-message-failed
+  "The syntax check failed. Inspect the *Messages* buffer for details.")
+
+(defconst helm-flycheck-status-message-dubious
+  "The syntax check had a dubious result. \
+Inspect the *Messages* buffer for details.")
+
 (defun helm-flycheck-init ()
   "Initialize `helm-source-flycheck'."
   (let ((status (helm-flycheck-status)))
-    (if (helm-flycheck-has-errors-p status)
-        (setq helm-flycheck-candidates
+    (setq helm-flycheck-candidates
+          (if (helm-flycheck-has-errors-p status)
               (mapcar 'helm-flycheck-make-candidate
-                      (flycheck-sort-errors flycheck-current-errors)))
-      (helm-flycheck-show-status-message status)
-      (helm-exit-minibuffer))))
+                      (flycheck-sort-errors flycheck-current-errors))
+            (list (helm-flycheck-status-message status))))))
 
 (defun helm-flycheck-status ()
   "Return `flycheck' status."
@@ -66,19 +83,18 @@
   "Check whether the current buffer has `flycheck' errors with STATUS."
   (equal ":" (ignore-errors (substring status 0 1))))
 
-(defun helm-flycheck-show-status-message (status)
-  "Show message about `flycheck' STATUS."
-  (message
-   (cond ((equal status "")
-          "There are no errors in the current buffer.")
-         ((equal status "*")
-          "A syntax check is being performed currently.")
-         ((equal status "-")
-          "Automatic syntax checker selection did not find a suitable syntax checker.")
-         ((equal status "!")
-          "The syntax check failed. Inspect the *Messages* buffer for details.")
-         ((equal status "?")
-          "The syntax check had a dubious result."))))
+(defun helm-flycheck-status-message (status)
+  "Return message about `flycheck' STATUS."
+  (cond ((equal status "")
+         helm-flycheck-status-message-no-errors)
+        ((equal status "*")
+         helm-flycheck-status-message-syntax-checking)
+        ((equal status "-")
+         helm-flycheck-status-message-checker-not-found)
+        ((equal status "!")
+         helm-flycheck-status-message-failed)
+        ((equal status "?")
+         helm-flycheck-status-message-dubious)))
 
 (defun helm-flycheck-make-candidate (error)
   "Return a string of candidate for the given ERROR."
@@ -100,6 +116,20 @@
             (or (funcall replace-nl-to-sp
                          (flycheck-error-message error)) ""))))
 
+(defun helm-flycheck-action-transformer (actions candidate)
+  "Return modified ACTIONS if CANDIDATE is status message."
+  (cond ((string= candidate helm-flycheck-status-message-no-errors))
+        ((string= candidate helm-flycheck-status-message-syntax-checking)
+         '(("Rerun helm-flycheck" . helm-flycheck-action-rerun)))
+        ((string= candidate helm-flycheck-status-message-checker-not-found)
+         '(("Enter info of Syntax checker selection" .
+            helm-flycheck-action-selection-info)))
+        ((or (string= candidate helm-flycheck-status-message-failed)
+             (string= candidate helm-flycheck-status-message-dubious))
+         '(("Switch to *Messages*" .
+            helm-flycheck-action-switch-to-messages-buffer)))
+        (:else actions)))
+
 (defun helm-flycheck-action-goto-error (candidate)
   "Visit error of CANDIDATE."
   (let* ((strings (split-string candidate))
@@ -116,6 +146,18 @@
              -uniq
              (-sort #'<=))))
     (goto-char error-pos)))
+
+(defun helm-flycheck-action-rerun (candidate)
+  "Rerun `helm-flycheck' without CANDIDATE."
+  (helm-run-after-quit 'helm-flycheck))
+
+(defun helm-flycheck-action-switch-to-messages-buffer (candidate)
+  "Switch to *Messages* buffer without CANDIDATE."
+  (switch-to-buffer "*Messages*"))
+
+(defun helm-flycheck-action-selection-info (candidate)
+  "Enter info of flycheck syntax checker selection without CANDIDATE."
+  (info "(flycheck)Top > Usage > Selection"))
 
 ;;;###autoload
 (defun helm-flycheck ()
