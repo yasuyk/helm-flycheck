@@ -98,9 +98,9 @@ Inspect the *Messages* buffer for details.")
 
 (defun helm-flycheck-make-candidate (error)
   "Return a cons constructed from string of message and ERROR."
-  (cons (helm-flycheck-make-candidate-string error) error))
+  (cons (helm-flycheck-candidate-display-string error) error))
 
-(defun helm-flycheck-make-candidate-string (error)
+(defun helm-flycheck-candidate-display-string (error)
   "Return a string of message constructed from ERROR."
   (let ((face (-> error
                 flycheck-error-level
@@ -173,14 +173,14 @@ Inspect the *Messages* buffer for details.")
          (overlays-at-point (flycheck-overlays-at point))
          candidates nearest-point)
     (if overlays-at-point
-        (helm-flycheck-make-candidate-string
+        (helm-flycheck-candidate-display-string
          (car (flycheck-overlay-errors-at point)))
       (setq candidates (->> (flycheck-overlays-in (point-min) (point-max))
                          (-map #'overlay-start)
                          -uniq))
       (setq nearest-point (helm-flycheck-nearest-point point candidates))
       (when nearest-point
-        (helm-flycheck-make-candidate-string
+        (helm-flycheck-candidate-display-string
          (car (flycheck-overlay-errors-at nearest-point)))))))
 
 (defun helm-flycheck-nearest-point (point points)
