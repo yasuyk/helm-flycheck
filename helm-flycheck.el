@@ -52,7 +52,7 @@
   "There are no errors in the current buffer.")
 
 (defconst helm-flycheck-status-message-syntax-checking
-  "Syntax checking now. Do action to rerun `helm-flycheck'.")
+  "Syntax checking now. Do action to reexecute `helm-flycheck'.")
 
 (defconst helm-flycheck-status-message-checker-not-found
   "A suitable syntax checker is not found. \
@@ -125,7 +125,7 @@ Inspect the *Messages* buffer for details.")
   (if (stringp candidate)
       (cond ((string= candidate helm-flycheck-status-message-no-errors))
             ((string= candidate helm-flycheck-status-message-syntax-checking)
-             '(("Rerun helm-flycheck" . helm-flycheck-action-rerun)))
+             '(("Reexecute helm-flycheck" . helm-flycheck-action-reexecute)))
             ((string= candidate helm-flycheck-status-message-checker-not-found)
              '(("Enter info of Syntax checker selection" .
                 helm-flycheck-action-selection-info)))
@@ -154,8 +154,8 @@ Inspect the *Messages* buffer for details.")
                (-sort #'<=))))
       (goto-char error-pos))))
 
-(defun helm-flycheck-action-rerun (candidate)
-  "Rerun `helm-flycheck' without CANDIDATE."
+(defun helm-flycheck-action-reexecute (candidate)
+  "Reexecute `helm-flycheck' without CANDIDATE."
   (helm-run-after-quit 'helm-flycheck))
 
 (defun helm-flycheck-action-switch-to-messages-buffer (candidate)
