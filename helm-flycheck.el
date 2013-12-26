@@ -183,10 +183,10 @@ Inspect the *Messages* buffer for details.")
         (helm-flycheck-candidate-display-string
          (car (flycheck-overlay-errors-at nearest-point)))))))
 
-(defun helm-flycheck-nearest-point (point points)
-  "Return nearest POINT in POINTS."
+(defun helm-flycheck-nearest-point (current-point points)
+  "Return nearest point from CURRENT-POINT in POINTS."
   (--tree-reduce-from
-   (if (< (abs (- point it)) (abs (- point acc)))
+   (if (< (abs (- current-point it)) (abs (- current-point acc)))
        it acc) (car points) points))
 
 ;;;###autoload
