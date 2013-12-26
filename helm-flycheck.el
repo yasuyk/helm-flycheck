@@ -52,7 +52,7 @@
   "There are no errors in the current buffer.")
 
 (defconst helm-flycheck-status-message-syntax-checking
-  "A syntax check is being performed currently.")
+  "Syntax checking now. Do action to rerun `helm-flycheck'.")
 
 (defconst helm-flycheck-status-message-checker-not-found
   "A suitable syntax checker is not found. \
@@ -119,7 +119,6 @@ Inspect the *Messages* buffer for details.")
                         'font-lock-face face)
             (or (funcall replace-nl-to-sp
                          (flycheck-error-message error)) ""))))
-
 
 (defun helm-flycheck-action-transformer (actions candidate)
   "Return modified ACTIONS if CANDIDATE is status message."
