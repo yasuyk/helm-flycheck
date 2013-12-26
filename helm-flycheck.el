@@ -188,7 +188,7 @@ Inspect the *Messages* buffer for details.")
   "Return nearest POINT in POINTS."
   (--tree-reduce-from
    (if (< (abs (- point it)) (abs (- point acc)))
-       it acc) 0 points))
+       it acc) (car points) points))
 
 ;;;###autoload
 (defun helm-flycheck ()
