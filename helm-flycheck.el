@@ -49,15 +49,22 @@
 
 (defun helm-flycheck-init ()
   "Initialize `helm-source-flycheck'."
-  (let ((status (cadr (split-string
-                       flycheck-mode-line
-                       flycheck-mode-line-lighter))))
-    (if (equal ":" (ignore-errors (substring status 0 1)))
+  (let ((status (helm-flycheck-status)))
+    (if (helm-flycheck-has-errors-p status)
         (setq helm-flycheck-candidates
               (mapcar 'helm-flycheck-make-candidate
                       (flycheck-sort-errors flycheck-current-errors)))
       (helm-flycheck-show-status-message status)
       (helm-exit-minibuffer))))
+
+(defun helm-flycheck-status ()
+  "Return `flycheck' status."
+  (ignore-errors
+    (cadr (split-string flycheck-mode-line flycheck-mode-line-lighter))))
+
+(defun helm-flycheck-has-errors-p (status)
+  "Check whether the current buffer has `flycheck' errors with STATUS."
+  (equal ":" (ignore-errors (substring status 0 1))))
 
 (defun helm-flycheck-show-status-message (status)
   "Show message about `flycheck' STATUS."
