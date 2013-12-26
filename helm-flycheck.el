@@ -97,7 +97,7 @@ Inspect the *Messages* buffer for details.")
          helm-flycheck-status-message-dubious)))
 
 (defun helm-flycheck-make-candidate (error)
-  "Return a string of candidate for the given ERROR."
+  "Return a cons constructed from string of message and ERROR."
   (let ((face (-> error
                 flycheck-error-level
                 flycheck-error-level-error-list-face))
@@ -105,47 +105,51 @@ Inspect the *Messages* buffer for details.")
                             (ignore-errors
                               (replace-regexp-in-string
                                "\n *" " " m)))))
-    (format "%5s %3s%8s  %s"
-            (flycheck-error-list-make-number-cell
-             (flycheck-error-line error) 'flycheck-error-list-line-number)
-            (flycheck-error-list-make-number-cell
-             (flycheck-error-column error)
-             'flycheck-error-list-column-number)
-            (propertize (symbol-name (flycheck-error-level error))
-                        'font-lock-face face)
-            (or (funcall replace-nl-to-sp
-                         (flycheck-error-message error)) ""))))
+    (cons
+     (format "%5s %3s%8s  %s"
+             (flycheck-error-list-make-number-cell
+              (flycheck-error-line error) 'flycheck-error-list-line-number)
+             (flycheck-error-list-make-number-cell
+              (flycheck-error-column error)
+              'flycheck-error-list-column-number)
+             (propertize (symbol-name (flycheck-error-level error))
+                         'font-lock-face face)
+             (or (funcall replace-nl-to-sp
+                          (flycheck-error-message error)) "")) error)))
 
 (defun helm-flycheck-action-transformer (actions candidate)
   "Return modified ACTIONS if CANDIDATE is status message."
-  (cond ((string= candidate helm-flycheck-status-message-no-errors))
-        ((string= candidate helm-flycheck-status-message-syntax-checking)
-         '(("Rerun helm-flycheck" . helm-flycheck-action-rerun)))
-        ((string= candidate helm-flycheck-status-message-checker-not-found)
-         '(("Enter info of Syntax checker selection" .
-            helm-flycheck-action-selection-info)))
-        ((or (string= candidate helm-flycheck-status-message-failed)
-             (string= candidate helm-flycheck-status-message-dubious))
-         '(("Switch to *Messages*" .
-            helm-flycheck-action-switch-to-messages-buffer)))
-        (:else actions)))
+    (if (stringp candidate)
+        (cond ((string= candidate helm-flycheck-status-message-no-errors))
+              ((string= candidate helm-flycheck-status-message-syntax-checking)
+               '(("Rerun helm-flycheck" . helm-flycheck-action-rerun)))
+              ((string= candidate helm-flycheck-status-message-checker-not-found)
+               '(("Enter info of Syntax checker selection" .
+                  helm-flycheck-action-selection-info)))
+              ((or (string= candidate helm-flycheck-status-message-failed)
+                   (string= candidate helm-flycheck-status-message-dubious))
+               '(("Switch to *Messages*" .
+                  helm-flycheck-action-switch-to-messages-buffer))))
+      actions))
 
 (defun helm-flycheck-action-goto-error (candidate)
   "Visit error of CANDIDATE."
-  (let* ((strings (split-string candidate))
-         (lineno (string-to-number (car strings)))
-         error-pos)
-    (goto-char (point-min))
-    (forward-line (1- lineno))
-    (setq error-pos
-          (car
-           (->> (flycheck-overlays-in
-                 (point)
-                 (save-excursion (forward-line 1) (point)))
-             (-map #'overlay-start)
-             -uniq
-             (-sort #'<=))))
-    (goto-char error-pos)))
+  (let ((buffer (flycheck-error-buffer candidate))
+        (lineno (flycheck-error-line candidate))
+        error-pos)
+    (with-current-buffer buffer
+      (switch-to-buffer buffer)
+      (goto-char (point-min))
+      (forward-line (1- lineno))
+      (setq error-pos
+            (car
+             (->> (flycheck-overlays-in
+                   (point)
+                   (save-excursion (forward-line 1) (point)))
+               (-map #'overlay-start)
+               -uniq
+               (-sort #'<=))))
+      (goto-char error-pos))))
 
 (defun helm-flycheck-action-rerun (candidate)
   "Rerun `helm-flycheck' without CANDIDATE."
