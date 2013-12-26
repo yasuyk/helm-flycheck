@@ -123,18 +123,18 @@ Inspect the *Messages* buffer for details.")
 
 (defun helm-flycheck-action-transformer (actions candidate)
   "Return modified ACTIONS if CANDIDATE is status message."
-    (if (stringp candidate)
-        (cond ((string= candidate helm-flycheck-status-message-no-errors))
-              ((string= candidate helm-flycheck-status-message-syntax-checking)
-               '(("Rerun helm-flycheck" . helm-flycheck-action-rerun)))
-              ((string= candidate helm-flycheck-status-message-checker-not-found)
-               '(("Enter info of Syntax checker selection" .
-                  helm-flycheck-action-selection-info)))
-              ((or (string= candidate helm-flycheck-status-message-failed)
-                   (string= candidate helm-flycheck-status-message-dubious))
-               '(("Switch to *Messages*" .
-                  helm-flycheck-action-switch-to-messages-buffer))))
-      actions))
+  (if (stringp candidate)
+      (cond ((string= candidate helm-flycheck-status-message-no-errors))
+            ((string= candidate helm-flycheck-status-message-syntax-checking)
+             '(("Rerun helm-flycheck" . helm-flycheck-action-rerun)))
+            ((string= candidate helm-flycheck-status-message-checker-not-found)
+             '(("Enter info of Syntax checker selection" .
+                helm-flycheck-action-selection-info)))
+            ((or (string= candidate helm-flycheck-status-message-failed)
+                 (string= candidate helm-flycheck-status-message-dubious))
+             '(("Switch to *Messages*" .
+                helm-flycheck-action-switch-to-messages-buffer))))
+    actions))
 
 (defun helm-flycheck-action-goto-error (candidate)
   "Visit error of CANDIDATE."
@@ -179,9 +179,9 @@ Inspect the *Messages* buffer for details.")
                          (-map #'overlay-start)
                          -uniq))
       (setq nearest-point (helm-flycheck-nearest-point point candidates))
-    (when nearest-point
-      (helm-flycheck-make-candidate-string
-       (car (flycheck-overlay-errors-at nearest-point)))))))
+      (when nearest-point
+        (helm-flycheck-make-candidate-string
+         (car (flycheck-overlay-errors-at nearest-point)))))))
 
 (defun helm-flycheck-nearest-point (point points)
   "Return nearest POINT in POINTS."
