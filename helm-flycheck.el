@@ -98,6 +98,10 @@ Inspect the *Messages* buffer for details.")
 
 (defun helm-flycheck-make-candidate (error)
   "Return a cons constructed from string of message and ERROR."
+  (cons (helm-flycheck-make-candidate-string error) error))
+
+(defun helm-flycheck-make-candidate-string (error)
+  "Return a string of message constructed from ERROR."
   (let ((face (-> error
                 flycheck-error-level
                 flycheck-error-level-error-list-face))
@@ -105,17 +109,17 @@ Inspect the *Messages* buffer for details.")
                             (ignore-errors
                               (replace-regexp-in-string
                                "\n *" " " m)))))
-    (cons
-     (format "%5s %3s%8s  %s"
-             (flycheck-error-list-make-number-cell
-              (flycheck-error-line error) 'flycheck-error-list-line-number)
-             (flycheck-error-list-make-number-cell
-              (flycheck-error-column error)
-              'flycheck-error-list-column-number)
-             (propertize (symbol-name (flycheck-error-level error))
-                         'font-lock-face face)
-             (or (funcall replace-nl-to-sp
-                          (flycheck-error-message error)) "")) error)))
+    (format "%5s %3s%8s  %s"
+            (flycheck-error-list-make-number-cell
+             (flycheck-error-line error) 'flycheck-error-list-line-number)
+            (flycheck-error-list-make-number-cell
+             (flycheck-error-column error)
+             'flycheck-error-list-column-number)
+            (propertize (symbol-name (flycheck-error-level error))
+                        'font-lock-face face)
+            (or (funcall replace-nl-to-sp
+                         (flycheck-error-message error)) ""))))
+
 
 (defun helm-flycheck-action-transformer (actions candidate)
   "Return modified ACTIONS if CANDIDATE is status message."
@@ -163,6 +167,29 @@ Inspect the *Messages* buffer for details.")
   "Enter info of flycheck syntax checker selection without CANDIDATE."
   (info "(flycheck)Top > Usage > Selection"))
 
+(defun helm-flycheck-preselect ()
+  "PreSelect nearest error from the current point."
+  (let* ((point (point))
+         (overlays-at-point (flycheck-overlays-at point))
+         candidates nearest-point)
+    (if overlays-at-point
+        (helm-flycheck-make-candidate-string
+         (car (flycheck-overlay-errors-at point)))
+      (setq candidates (->> (flycheck-overlays-in (point-min) (point-max))
+                         (-map #'overlay-start)
+                         -uniq
+                         (-sort #'<=)))
+      (setq nearest-point (helm-flycheck-nearest-point point candidates))
+    (when nearest-point
+      (helm-flycheck-make-candidate-string
+       (car (flycheck-overlay-errors-at nearest-point)))))))
+
+(defun helm-flycheck-nearest-point (point points)
+  "Return nearest POINT in POINTS."
+  (--tree-reduce-from
+   (if (< (abs (- point it)) (abs (- point acc)))
+       it acc) 0 points))
+
 ;;;###autoload
 (defun helm-flycheck ()
   "Show flycheck errors with `helm'."
@@ -170,7 +197,8 @@ Inspect the *Messages* buffer for details.")
   (unless flycheck-mode
     (user-error "Flycheck mode not enabled"))
   (helm :sources 'helm-source-flycheck
-        :buffer "*helm flycheck*"))
+        :buffer "*helm flycheck*"
+        :preselect (helm-flycheck-preselect)))
 
 (provide 'helm-flycheck)
 
