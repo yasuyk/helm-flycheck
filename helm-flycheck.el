@@ -177,8 +177,7 @@ Inspect the *Messages* buffer for details.")
          (car (flycheck-overlay-errors-at point)))
       (setq candidates (->> (flycheck-overlays-in (point-min) (point-max))
                          (-map #'overlay-start)
-                         -uniq
-                         (-sort #'<=)))
+                         -uniq))
       (setq nearest-point (helm-flycheck-nearest-point point candidates))
     (when nearest-point
       (helm-flycheck-make-candidate-string
