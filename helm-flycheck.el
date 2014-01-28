@@ -44,6 +44,7 @@
     (init . helm-flycheck-init)
     (candidates . helm-flycheck-candidates)
     (action-transformer helm-flycheck-action-transformer)
+    (multiline)
     (action . (("Go to" . helm-flycheck-action-goto-error)))))
 
 (defvar helm-flycheck-candidates nil)
@@ -104,11 +105,7 @@ Inspect the *Messages* buffer for details.")
   "Return a string of message constructed from ERROR."
   (let ((face (-> error
                 flycheck-error-level
-                flycheck-error-level-error-list-face))
-        (replace-nl-to-sp (lambda (m)
-                            (ignore-errors
-                              (replace-regexp-in-string
-                               "\n *" " " m)))))
+                flycheck-error-level-error-list-face)))
     (format "%5s %3s%8s  %s"
             (flycheck-error-list-make-number-cell
              (flycheck-error-line error) 'flycheck-error-list-line-number)
@@ -117,8 +114,7 @@ Inspect the *Messages* buffer for details.")
              'flycheck-error-list-column-number)
             (propertize (symbol-name (flycheck-error-level error))
                         'font-lock-face face)
-            (or (funcall replace-nl-to-sp
-                         (flycheck-error-message error)) ""))))
+            (or (flycheck-error-message error) ""))))
 
 (defun helm-flycheck-action-transformer (actions candidate)
   "Return modified ACTIONS if CANDIDATE is status message."
