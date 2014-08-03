@@ -5,7 +5,7 @@
 ;; Author: Yasuyuki Oka <yasuyk@gmail.com>
 ;; Version: 0.2
 ;; URL: https://github.com/yasuyk/helm-flycheck
-;; Package-Requires: ((dash "2.4.0") (flycheck "0.15") (helm "1.5.7"))
+;; Package-Requires: ((dash "2.4.0") (flycheck "0.20-cvs") (helm "1.5.7"))
 ;; Keywords: helm, flycheck
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -77,8 +77,7 @@ Inspect the *Messages* buffer for details.")
 
 (defun helm-flycheck-status ()
   "Return `flycheck' status."
-  (ignore-errors
-    (cadr (split-string flycheck-mode-line flycheck-mode-line-lighter))))
+  (flycheck-mode-line-status-text))
 
 (defun helm-flycheck-has-errors-p (status)
   "Check whether the current buffer has `flycheck' errors with STATUS."
