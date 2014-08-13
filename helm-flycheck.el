@@ -68,32 +68,23 @@ Inspect the *Messages* buffer for details.")
 
 (defun helm-flycheck-init ()
   "Initialize `helm-source-flycheck'."
-  (let ((status (helm-flycheck-status)))
-    (setq helm-flycheck-candidates
-          (if (helm-flycheck-has-errors-p status)
-              (mapcar 'helm-flycheck-make-candidate
-                      (flycheck-sort-errors flycheck-current-errors))
-            (list (helm-flycheck-status-message status))))))
+  (setq helm-flycheck-candidates
+        (if (flycheck-has-current-errors-p)
+            (mapcar 'helm-flycheck-make-candidate
+                    (flycheck-sort-errors flycheck-current-errors))
+          (list (helm-flycheck-status-message)))))
 
-(defun helm-flycheck-status ()
-  "Return `flycheck' status."
-  (flycheck-mode-line-status-text))
-
-(defun helm-flycheck-has-errors-p (status)
-  "Check whether the current buffer has `flycheck' errors with STATUS."
-  (equal ":" (ignore-errors (substring status 0 1))))
-
-(defun helm-flycheck-status-message (status)
+(defun helm-flycheck-status-message ()
   "Return message about `flycheck' STATUS."
-  (cond ((equal status "")
+  (cond ((equal flycheck-last-status-change 'finished)
          helm-flycheck-status-message-no-errors)
-        ((equal status "*")
+        ((equal flycheck-last-status-change 'running)
          helm-flycheck-status-message-syntax-checking)
-        ((equal status "-")
+        ((equal flycheck-last-status-change 'no-checker)
          helm-flycheck-status-message-checker-not-found)
-        ((equal status "!")
+        ((equal flycheck-last-status-change 'errored)
          helm-flycheck-status-message-failed)
-        ((equal status "?")
+        ((equal flycheck-last-status-change 'suspicious)
          helm-flycheck-status-message-dubious)))
 
 (defun helm-flycheck-make-candidate (error)
