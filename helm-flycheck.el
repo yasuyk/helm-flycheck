@@ -97,11 +97,8 @@ Inspect the *Messages* buffer for details.")
                 flycheck-error-level
                 flycheck-error-level-error-list-face)))
     (format "%5s %3s%8s  %s"
-            (flycheck-error-list-make-number-cell
-             (flycheck-error-line error) 'flycheck-error-list-line-number)
-            (flycheck-error-list-make-number-cell
-             (flycheck-error-column error)
-             'flycheck-error-list-column-number)
+            (propertize (number-to-string (flycheck-error-line error)) 'font-lock-face 'flycheck-error-list-line-number)
+            (propertize (number-to-string (flycheck-error-column error)) 'font-lock-face 'flycheck-error-list-column-number)
             (propertize (symbol-name (flycheck-error-level error))
                         'font-lock-face face)
             (or (flycheck-error-message error) ""))))
