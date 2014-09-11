@@ -71,7 +71,7 @@ Inspect the *Messages* buffer for details.")
   (setq helm-flycheck-candidates
         (if (flycheck-has-current-errors-p)
             (mapcar 'helm-flycheck-make-candidate
-                    (flycheck-sort-errors flycheck-current-errors))
+                    (sort flycheck-current-errors #'flycheck-error-<))
           (list (helm-flycheck-status-message)))))
 
 (defun helm-flycheck-status-message ()
