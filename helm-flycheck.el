@@ -71,7 +71,7 @@ Inspect the *Messages* buffer for details.")
   (setq helm-flycheck-candidates
         (if (flycheck-has-current-errors-p)
             (mapcar 'helm-flycheck-make-candidate
-                    (flycheck-sort-errors flycheck-current-errors))
+                    (sort flycheck-current-errors #'flycheck-error-<))
           (list (helm-flycheck-status-message)))))
 
 (defun helm-flycheck-status-message ()
@@ -97,11 +97,9 @@ Inspect the *Messages* buffer for details.")
                 flycheck-error-level
                 flycheck-error-level-error-list-face)))
     (format "%5s %3s%8s  %s"
-            (flycheck-error-list-make-number-cell
-             (flycheck-error-line error) 'flycheck-error-list-line-number)
-            (flycheck-error-list-make-number-cell
-             (flycheck-error-column error)
-             'flycheck-error-list-column-number)
+            (propertize (number-to-string (flycheck-error-line error)) 'font-lock-face 'flycheck-error-list-line-number)
+            (if-let (column (flycheck-error-column error))
+                (propertize (number-to-string column) 'font-lock-face 'flycheck-error-list-column-number) "")
             (propertize (symbol-name (flycheck-error-level error))
                         'font-lock-face face)
             (or (flycheck-error-message error) ""))))
