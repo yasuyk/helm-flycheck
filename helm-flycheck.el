@@ -98,7 +98,7 @@ Inspect the *Messages* buffer for details.")
                 flycheck-error-level-error-list-face)))
     (format "%5s %3s%8s  %s"
             (propertize (number-to-string (flycheck-error-line error)) 'font-lock-face 'flycheck-error-list-line-number)
-            (if-let (column (flycheck-error-column error))
+            (-if-let (column (flycheck-error-column error))
                 (propertize (number-to-string column) 'font-lock-face 'flycheck-error-list-column-number) "")
             (propertize (symbol-name (flycheck-error-level error))
                         'font-lock-face face)
