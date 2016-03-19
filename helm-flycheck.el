@@ -5,7 +5,7 @@
 ;; Author: Yasuyuki Oka <yasuyk@gmail.com>
 ;; Version: 0.2
 ;; URL: https://github.com/yasuyk/helm-flycheck
-;; Package-Requires: ((dash "2.4.0") (flycheck "0.20-cvs") (helm "1.5.7"))
+;; Package-Requires: ((dash "2.12.1") (flycheck "0.25.1") (helm "1.9.3"))
 ;; Keywords: helm, flycheck
 
 ;; This program is free software; you can redistribute it and/or modify
