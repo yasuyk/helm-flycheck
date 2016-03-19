@@ -140,7 +140,7 @@ Inspect the *Messages* buffer for details.")
 
 (defun helm-flycheck-action-reexecute (candidate)
   "Reexecute `helm-flycheck' without CANDIDATE."
-  (helm-run-after-quit 'helm-flycheck))
+  (helm-run-after-exit 'helm-flycheck))
 
 (defun helm-flycheck-action-switch-to-messages-buffer (candidate)
   "Switch to *Messages* buffer without CANDIDATE."
