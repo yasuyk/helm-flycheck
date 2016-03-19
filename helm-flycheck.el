@@ -107,7 +107,7 @@ Inspect the *Messages* buffer for details.")
 (defun helm-flycheck-action-transformer (actions candidate)
   "Return modified ACTIONS if CANDIDATE is status message."
   (if (stringp candidate)
-      (cond ((string= candidate helm-flycheck-status-message-no-errors))
+      (cond ((string= candidate helm-flycheck-status-message-no-errors) nil)
             ((string= candidate helm-flycheck-status-message-syntax-checking)
              '(("Reexecute helm-flycheck" . helm-flycheck-action-reexecute)))
             ((string= candidate helm-flycheck-status-message-checker-not-found)
