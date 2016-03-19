@@ -1,6 +1,6 @@
 ;;; helm-flycheck.el --- Show flycheck errors with helm
 
-;; Copyright (C) 2013 Yasuyuki Oka <yasuyk@gmail.com>
+;; Copyright (C) 2013-2016 Yasuyuki Oka <yasuyk@gmail.com>
 
 ;; Author: Yasuyuki Oka <yasuyk@gmail.com>
 ;; Version: 0.2
