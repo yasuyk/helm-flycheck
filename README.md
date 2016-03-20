@@ -1,4 +1,4 @@
-# helm-flycheck.el
+# helm-flycheck.el [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 Show [flycheck] errors with [helm].
 
@@ -31,3 +31,9 @@ Show [flycheck] errors with [helm].
 [helm]:https://github.com/emacs-helm/helm
 [flycheck]:http://flycheck.github.io/
 [dash]:https://github.com/magnars/dash.el
+[travis-badge]: https://travis-ci.org/yasuyk/helm-flycheck.svg
+[travis-link]: https://travis-ci.org/yasuyk/helm-flycheck
+[melpa-link]: http://melpa.org/#/helm-flycheck
+[melpa-stable-link]: http://stable.melpa.org/#/helm-flycheck
+[melpa-badge]: http://melpa.org/packages/helm-flycheck-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/helm-flycheck-badge.svg
