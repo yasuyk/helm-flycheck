@@ -45,7 +45,9 @@
     (candidates . helm-flycheck-candidates)
     (action-transformer helm-flycheck-action-transformer)
     (multiline)
-    (action . (("Go to" . helm-flycheck-action-goto-error)))))
+    (action . (("Go to" . helm-flycheck-action-goto-error)))
+    (follow . 1)))
+
 
 (defvar helm-flycheck-candidates nil)
 
@@ -136,7 +138,9 @@ Inspect the *Messages* buffer for details.")
                (-map #'overlay-start)
                -uniq
                (-sort #'<=))))
-      (goto-char error-pos))))
+      (goto-char error-pos)
+      (let ((recenter-redisplay nil))
+        (recenter)))))
 
 (defun helm-flycheck-action-reexecute (candidate)
   "Reexecute `helm-flycheck' without CANDIDATE."
