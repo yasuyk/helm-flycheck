@@ -3,7 +3,7 @@
 ;; Copyright (C) 2013-2016 Yasuyuki Oka <yasuyk@gmail.com>
 
 ;; Author: Yasuyuki Oka <yasuyk@gmail.com>
-;; Version: 0.3
+;; Version: 0.4
 ;; URL: https://github.com/yasuyk/helm-flycheck
 ;; Package-Requires: ((dash "2.12.1") (flycheck "28") (helm-core "1.9.8"))
 ;; Keywords: helm, flycheck
