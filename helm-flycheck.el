@@ -125,20 +125,23 @@ Inspect the *Messages* buffer for details.")
   "Visit error of CANDIDATE."
   (let ((buffer (flycheck-error-buffer candidate))
         (lineno (flycheck-error-line candidate))
+        (column (flycheck-error-column candidate))
         error-pos)
     (with-current-buffer buffer
       (switch-to-buffer buffer)
       (goto-char (point-min))
       (forward-line (1- lineno))
-      (setq error-pos
-            (car
-             (->> (flycheck-overlays-in
-                   (point)
-                   (save-excursion (forward-line 1) (point)))
-               (-map #'overlay-start)
-               -uniq
-               (-sort #'<=))))
-      (goto-char error-pos)
+      (if column
+          (move-to-column column)
+        (setq error-pos
+              (car
+               (->> (flycheck-overlays-in
+                     (point)
+                     (save-excursion (forward-line 1) (point)))
+                    (-map #'overlay-start)
+                    -uniq
+                    (-sort #'<=))))
+        (goto-char error-pos))
       (let ((recenter-redisplay nil))
         (recenter)))))
 
